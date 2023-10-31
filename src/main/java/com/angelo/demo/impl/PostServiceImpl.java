@@ -43,6 +43,10 @@ public class PostServiceImpl implements PostService {
     private String api;
 
 
+    /**
+     * Finds all posts from the database
+     * @return List of PostDto
+     */
     @Override
     @Transactional
     public List<PostDto> findAll() {
@@ -56,6 +60,11 @@ public class PostServiceImpl implements PostService {
         return postDtos.isEmpty() ? Collections.emptyList() : postDtos;
     }
 
+    /**
+     * Finds an individual post by post ID
+     * @param id
+     * @return PostDto
+     */
     @Override
     @Transactional
     public PostDto findById(Long id) {
@@ -66,6 +75,11 @@ public class PostServiceImpl implements PostService {
         return post.map(value -> mapper.postToDto(value)).orElse(null);
     }
 
+    /**
+     * Finds all posts by userID.
+     * @param userId
+     * @return List of PostDto containing all posts for the given userId
+     */
     @Override
     @Transactional
     public List<PostDto> findAllPostsByUserId(Long userId) {
@@ -77,6 +91,12 @@ public class PostServiceImpl implements PostService {
         return postDtos.isEmpty() ? Collections.emptyList() : postDtos;
     }
 
+    /**
+     * Saves new post. Checks if the user exists first
+     * @param userId
+     * @param dto
+     * @return
+     */
     @Override
     @Transactional
     public PostDto savePost(Long userId, PostDto dto) {
@@ -98,6 +118,14 @@ public class PostServiceImpl implements PostService {
         }
     }
 
+    /**
+     * Updates an existing post. Checks if the user exists, then checks if post to be updated exists,
+     * then ensures the post ID belongs to the given user
+     * @param id
+     * @param userId
+     * @param dto
+     * @return
+     */
     @Override
     @Transactional
     public PostDto updatePost(Long id, Long userId, PostDto dto) {
@@ -140,6 +168,11 @@ public class PostServiceImpl implements PostService {
         }
     }
 
+    /**
+     * Delete an individual post by ID. Checks if the post to be deleted exists
+     * @param id
+     * @throws Exception
+     */
     @Override
     @Transactional
     public void deleteById(Long id) throws Exception {
@@ -151,6 +184,10 @@ public class PostServiceImpl implements PostService {
         }
     }
 
+    /**
+     * Makes an API call to fetch posts and save to the database.
+     * @throws Exception
+     */
     @Override
     @Transactional
     public void fetchPosts() throws Exception {

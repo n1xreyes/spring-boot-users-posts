@@ -46,6 +46,12 @@ public class UserServiceImpl implements UserService {
     @Value("${users.api.url}")
     private String usersApi;
 
+    /**
+     * Gets all users from the database. This makes a database call to userRepository to build a list of users
+     * then for each user, makes a database call to postRepository to retrieve posts by user's ID.
+     * @return List of UserAndPostsDto or an empty list
+     * @throws Exception
+     */
     @Override
     @Transactional
     public List<UserAndPostsDto> getAllUsers() throws Exception {
@@ -60,7 +66,7 @@ public class UserServiceImpl implements UserService {
             for (User user : usersList) {
                 UserAndPostsDto dto = mapper.toDto(user);
                 List<Post> postsList = postRepository.findByUserId(user.getId());
-                if (!postsList.isEmpty()) {
+                if (!postsList.isEmpty() && null != dto) {
                     dto.setPosts(postsList);
                 }
                 userAndPostsDtos.add(dto);
@@ -72,6 +78,12 @@ public class UserServiceImpl implements UserService {
         return Collections.emptyList();
     }
 
+    /**
+     * retrieves an individual  user and posts by userId
+     * @param id
+     * @return UserAndPostsDto or null
+     * @throws Exception
+     */
     @Override
     @Transactional
     public UserAndPostsDto getUserById(Long id) throws Exception {
@@ -90,6 +102,13 @@ public class UserServiceImpl implements UserService {
         return null;
     }
 
+    /**
+     * Adds a new user and posts (if any) to the database. This first validates the properties
+     * to check for missing or invalid values
+     * @param @UserAndPosts dto
+     * @return UserAndPostsDto
+     * @throws Exception
+     */
     @Override
     @Transactional
     public UserAndPostsDto addUser(UserAndPostsDto dto) throws Exception {
@@ -118,6 +137,12 @@ public class UserServiceImpl implements UserService {
 
     }
 
+    /**
+     * Updates an existing user
+     * @param @UserAndPosts dto
+     * @return UserAndPostsDto
+     * @throws Exception
+     */
     @Override
     @Transactional
     public UserAndPostsDto changeUser(UserAndPostsDto dto) throws Exception {
@@ -139,6 +164,11 @@ public class UserServiceImpl implements UserService {
         throw new UserNotFoundException("User to update not found");
     }
 
+    /**
+     * Deletes an existing user by id. First checks if it exists in the database.
+     * @param id
+     * @throws Exception
+     */
     @Override
     @Transactional
     public void deleteUser(Long id) throws Exception {
@@ -150,6 +180,10 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    /**
+     * Makes 2 API calls to retrieve users and posts, then saves them to the database
+     * @throws Exception
+     */
     @Override
     @Transactional
     public void fetchAllUsersFromApi() throws Exception {
@@ -171,6 +205,10 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    /**
+     * validates new user. checks if username and email are unique
+     * @param dto
+     */
     private void validateNewUser(UserAndPostsDto dto) {
         LOGGER.info("validate new user");
 
@@ -187,6 +225,10 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    /**
+     * validates user. Checks if full name, username and email are missing.
+     * @param dto
+     */
     private void validateUser(UserAndPostsDto dto) {
         LOGGER.info("validate existing user");
 
