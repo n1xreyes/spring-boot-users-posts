@@ -23,4 +23,14 @@ public class GlobalExceptionHandler  {
         return ResponseEntity.badRequest().body(ex.getMessage());
     }
 
+    @ExceptionHandler(PostNotFoundException.class)
+    public ResponseEntity<Object> handlePostNotFoundException(PostNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(PostInvalidException.class)
+    public ResponseEntity<Object> handlePostInvalidException(PostInvalidException ex) {
+        return ResponseEntity.badRequest().body(ex.getMessage());
+    }
+
 }

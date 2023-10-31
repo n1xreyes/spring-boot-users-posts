@@ -50,6 +50,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public List<UserAndPostsDto> getAllUsers() throws Exception {
         LOGGER.info("Fetch users from database");
+
         List<User> usersList = StreamSupport.stream(userRepository.findAll().spliterator(), false)
                 .toList();
 
@@ -126,8 +127,8 @@ public class UserServiceImpl implements UserService {
         if (userRepository.existsById(dto.getId())) {
             try {
                 User savedUser = userRepository.save(mapper.dtoToUser(dto));
-                LOGGER.info("user updated");
                 List<Post> posts = postRepository.findByUserId(savedUser.getId());
+                LOGGER.info("user updated");
                 return mapper.toDto(savedUser, posts);
             } catch (Exception e) {
                 String errorMessage = MessageFormat.format("An exception occurred {0} - cause: {1}", e.getMessage(), e.getCause());
@@ -142,7 +143,6 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void deleteUser(Long id) throws Exception {
         LOGGER.info("deleting user with ID {}", id);
-        LOGGER.debug("check if exists in database: {}", userRepository.existsById(id));
         if (userRepository.existsById(id)) {
             userRepository.deleteById(id);
         } else {

@@ -1,5 +1,6 @@
 package com.angelo.demo.mapper;
 
+import com.angelo.demo.dto.PostDto;
 import com.angelo.demo.dto.UserAndPostsDto;
 import com.angelo.demo.entity.Post;
 import com.angelo.demo.entity.User;
@@ -41,7 +42,12 @@ public class Mapper {
         return user;
     }
 
-    public Post dtoToPost(Post dto) {
-        return modelMapper.map(dto, Post.class);
+    public Post dtoToPost(Long userId, PostDto dto) {
+        Post post = modelMapper.map(dto, Post.class);
+        post.setUserId(userId);
+
+        return post;
     }
+
+    public PostDto postToDto(Post post) { return modelMapper.map(post, PostDto.class); }
 }
