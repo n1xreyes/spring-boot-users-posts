@@ -19,10 +19,6 @@ public class Post implements Serializable {
     private Long id;
     private String title;
     private String body;
-    @Column(name = "poster_id")
     private Long userId;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
 }
 
