@@ -44,4 +44,14 @@
         <appender-ref ref="Console" />
     </logger>
 
+    <!-- For Debugging - ensure these are set to TRACE for maximum security detail -->
+    <logger name="org.springframework.security" level="TRACE" additivity="false">
+        <appender-ref ref="RollingFile" />
+        <appender-ref ref="Console" />
+    </logger>
+    <logger name="org.springframework.web" level="DEBUG" additivity="false">
+        <appender-ref ref="RollingFile" />
+        <appender-ref ref="Console" />
+    </logger>
+
 </configuration>
