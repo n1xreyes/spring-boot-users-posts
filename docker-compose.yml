@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   auth-server:
     image: quay.io/keycloak/keycloak:26.2.0
@@ -5,7 +7,6 @@ services:
     command:
       - start-dev
       - --import-realm
-      - --health-enabled=true
     ports:
       - "8080:8080"
     volumes:
@@ -22,12 +23,6 @@ services:
       KC_HTTP_ENABLED: true
       KC_HEALTH_ENABLED: true
       KC_METRICS_ENABLED: true
-    healthcheck:
-      test: ['CMD-SHELL', '[ -f /tmp/HealthCheck.java ] || echo "public class HealthCheck { public static void main(String[] args) throws java.lang.Throwable { System.exit(java.net.HttpURLConnection.HTTP_OK == ((java.net.HttpURLConnection)new java.net.URL(args[0]).openConnection()).getResponseCode() ? 0 : 1); } }" > /tmp/HealthCheck.java && java /tmp/HealthCheck.java http://localhost:8080/auth/health/live']
-      interval: 10s # Check every 10 seconds
-      timeout: 5s   # Wait 5 seconds for response
-      retries: 10   # Try 10 times before failing
-      start_period: 30s # Allow 30 seconds initial startup time before first check
 
   demo-app:
     build:
@@ -38,5 +33,5 @@ services:
     ports:
       - "8081:8081"
     depends_on:
-      auth-server:
-        condition: service_healthy
+      - auth-server
+    command: ["sh", "-c", "sleep 30 && java -jar opt/app/app.jar"] # we don't want this container to start up before auth-server is up and ready
