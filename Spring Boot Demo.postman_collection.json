@@ -1,0 +1,659 @@
+{
+	"info": {
+		"_postman_id": "75a8de9e-3274-4e9f-be9b-7748c3379c30",
+		"name": "Spring Boot Demo",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "5303296"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "initial access token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"responseJSON = JSON.parse(responseBody);",
+									"postman.clearGlobalVariable();",
+									"pm.globals.set(\"accessToken\", responseJSON.access_token);",
+									"pm.globals.set(\"refreshToken\", responseJSON.refresh_token);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "SECRET",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "myclient",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "client_id",
+									"value": "myclient",
+									"type": "text"
+								},
+								{
+									"key": "username",
+									"value": "testuser",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "password",
+									"type": "text"
+								},
+								{
+									"key": "grant_type",
+									"value": "password",
+									"type": "text"
+								},
+								{
+									"key": "userId",
+									"value": "myuser",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8080/realms/myrealm/protocol/openid-connect/token",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"realms",
+								"myrealm",
+								"protocol",
+								"openid-connect",
+								"token"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "refresh token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"responseJSON = JSON.parse(responseBody);",
+									"// pm.environment.set(\"accessToken\", responseJSON.access_token);",
+									"// pm.environment.set(\"refreshToken\", responseJSON.refresh_token);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "client_id",
+									"value": " myclient",
+									"type": "text"
+								},
+								{
+									"key": "refresh_token",
+									"value": " {{refresh_token}}",
+									"type": "text"
+								},
+								{
+									"key": "grant_type",
+									"value": " refresh_token",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8080/realms/myrealm/protocol/openid-connect/token",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"realms",
+								"myrealm",
+								"protocol",
+								"openid-connect",
+								"token"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Get all Users and posts",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8081/users",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Find by User ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8081/users/find-by-id?id=6",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"users",
+								"find-by-id"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "6"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add new user",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n        \"fullName\": \"Angelo Reyes\",\n        \"userName\": \"areyes\",\n        \"email\": \"angelo.reyes@canadalife.com\",\n        \"address\": {\n            \"street\": \"255 Dufferin Ave\",\n            \"suite\": \"\",\n            \"city\": \"London\",\n            \"zipcode\": \"N6A 4K1\"\n        },\n        \"phone\": \"024-648-3804\",\n        \"website\": \"ambrose.net\",\n        \"company\": {\n            \"name\": \"Canada Life\",\n            \"catchPhrase\": \"best life\",\n            \"bs\": \"offer the best products\"\n        },\n        \"posts\": [\n            {\n                \"title\": \"aut amet sed\",\n                \"body\": \"libero voluptate eveniet aperiam sed\\nsunt placeat suscipit molestias\\nsimilique fugit nam natus\\nexpedita consequatur consequatur dolores quia eos et placeat\"\n            },\n            {\n\n                \"title\": \"ratione ex tenetur perferendis\",\n                \"body\": \"aut et excepturi dicta laudantium sint rerum nihil\\nlaudantium et at\\na neque minima officia et similique libero et\\ncommodi voluptate qui\"\n            },\n            {\n                \"title\": \"beatae soluta recusandae\",\n                \"body\": \"dolorem quibusdam ducimus consequuntur dicta aut quo laboriosam\\nvoluptatem quis enim recusandae ut sed sunt\\nnostrum est odit totam\\nsit error sed sunt eveniet provident qui nulla\"\n\n            },\n            {\n\n                \"title\": \"qui qui voluptates illo iste minima\",\n                \"body\": \"aspernatur expedita soluta quo ab ut similique\\nexpedita dolores amet\\nsed temporibus distinctio magnam saepe deleniti\\nomnis facilis nam ipsum natus sint similique omnis\"\n            },\n            {\n                \"title\": \"id minus libero illum nam ad officiis\",\n                \"body\": \"earum voluptatem facere provident blanditiis velit laboriosam\\npariatur accusamus odio saepe\\ncumque dolor qui a dicta ab doloribus consequatur omnis\\ncorporis cupiditate eaque assumenda ad nesciunt\"\n\n            },\n            {\n\n                \"title\": \"quaerat velit veniam amet cupiditate aut numquam ut sequi\",\n                \"body\": \"in non odio excepturi sint eum\\nlabore voluptates vitae quia qui et\\ninventore itaque rerum\\nveniam non exercitationem delectus aut\"\n            },\n            {\n                \"title\": \"quas fugiat ut perspiciatis vero provident\",\n                \"body\": \"eum non blanditiis soluta porro quibusdam voluptas\\nvel voluptatem qui placeat dolores qui velit aut\\nvel inventore aut cumque culpa explicabo aliquid at\\nperspiciatis est et voluptatem dignissimos dolor itaque sit nam\"\n            },\n            {\n                \"title\": \"laboriosam dolor voluptates\",\n                \"body\": \"doloremque ex facilis sit sint culpa\\nsoluta assumenda eligendi non ut eius\\nsequi ducimus vel quasi\\nveritatis est dolores\"\n            },\n            {\n                \"title\": \"temporibus sit alias delectus eligendi possimus magni\",\n                \"body\": \"quo deleniti praesentium dicta non quod\\naut est molestias\\nmolestias et officia quis nihil\\nitaque dolorem quia\"\n            },\n            {\n                \"title\": \"at nam consequatur ea labore ea harum\",\n                \"body\": \"cupiditate quo est a modi nesciunt soluta\\nipsa voluptas error itaque dicta in\\nautem qui minus magnam et distinctio eum\\naccusamus ratione error aut\"\n            }\n        ]\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/users",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Change user",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n        \"id\": 11,\n        \"fullName\": \"Angelo Reyes\",\n        \"userName\": \"areyes\",\n        \"email\": \"angelo.reyes@canadalife.com\",\n        \"address\": {\n            \"street\": \"255 Dufferin Ave\",\n            \"suite\": \"\",\n            \"city\": \"London\",\n            \"zipcode\": \"N6A 4K1\"\n        },\n        \"phone\": \"024-648-3804\",\n        \"website\": \"ambrose.net\",\n        \"company\": {\n            \"name\": \"Canada Life\",\n            \"catchPhrase\": \"best life\",\n            \"bs\": \"offer the best products\"\n        }\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/users",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete user",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8081/users?id=11",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"users"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "11"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fetch users from API",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8081/users/fetch",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"users",
+								"fetch"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Posts",
+			"item": [
+				{
+					"name": "Get all Posts",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8081/posts",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"posts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Find post By Post ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8081/posts/100",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"posts",
+								"100"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all posts by User ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8081/posts?userId=10",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"posts"
+							],
+							"query": [
+								{
+									"key": "userId",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Post",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "  {\n        \"title\": \"This is my test post title\",\n        \"body\": \"I saved it!\"\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/posts?userId=10",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"posts"
+							],
+							"query": [
+								{
+									"key": "userId",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Post",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "  {\n        \"title\": \"This is my test post title\",\n        \"body\": \"I updated it!\"\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/posts?id=91&userId=10",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"posts"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "91"
+								},
+								{
+									"key": "userId",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete post By ID Copy",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8081/posts/100",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"posts",
+								"100"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fetch posts from third party API",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8081/posts/fetch",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"posts",
+								"fetch"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
