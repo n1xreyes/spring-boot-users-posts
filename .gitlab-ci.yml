@@ -3,7 +3,7 @@ image: maven:3.9-eclipse-temurin-17
 stages:
   - build_test
   - package
-  - deploy
+#  - deploy
 
 variables:
   MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
@@ -43,32 +43,32 @@ package_app:
 
 # Job: Placeholder for Deployment to Kubernetes
 # This job is manual and serves as a template for future implementation.
-deploy_to_k8s_placeholder:
-  stage: deploy
-  image: alpine:latest
-  # This job needs the JAR artifact from the 'package_app' job
-  needs: ["package_app"]
-  script:
-    - echo "--- Placeholder: Deploying to Kubernetes ---"
-    - echo "This is a placeholder job. Actual deployment steps would go here."
-    - echo "Steps would typically involve:"
-    - echo "1. Login to a Docker Registry (e.g., GitLab Container Registry, Docker Hub, ECR, GCR)"
-    # - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - echo "2. Build the Docker image using the Dockerfile and the JAR artifact"
-    # - ls -l target/ # Verify JAR exists from previous stage artifact
-    # - docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG . # Example: using commit tag
-    # - docker build -t my-registry/my-app:latest . # Example: generic
-    - echo "3. Push the Docker image to the registry"
-    # - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG
-    # - docker push my-registry/my-app:latest
-    - echo "4. Configure kubectl (if not already configured on the runner)"
-    # - Configure KUBECONFIG variable or use GitLab's K8s integration
-    - echo "5. Apply Kubernetes manifests or use Helm to deploy/update the application"
-    # - kubectl apply -f k8s/deployment.yaml
-    # - helm upgrade --install my-release ./helm-chart -f values.yaml --set image.tag=$CI_COMMIT_TAG
-    - echo "6. Deploy Keycloak (if needed) and configure application connection details (secrets/configmaps)"
-    - echo "Deployment Complete (Placeholder)"
-  when: manual # Trigger this job manually from the GitLab UI
-  environment:
-    name: staging
-    # url: Link to the deployed environment
+#deploy_to_k8s_placeholder:
+#  stage: deploy
+#  image: alpine:latest
+#  # This job needs the JAR artifact from the 'package_app' job
+#  needs: ["package_app"]
+#  script:
+#    - echo "--- Placeholder: Deploying to Kubernetes ---"
+#    - echo "This is a placeholder job. Actual deployment steps would go here."
+#    - echo "Steps would typically involve:"
+#    - echo "1. Login to a Docker Registry (e.g., GitLab Container Registry, Docker Hub, ECR, GCR)"
+#    # - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+#    - echo "2. Build the Docker image using the Dockerfile and the JAR artifact"
+#    # - ls -l target/ # Verify JAR exists from previous stage artifact
+#    # - docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG . # Example: using commit tag
+#    # - docker build -t my-registry/my-app:latest . # Example: generic
+#    - echo "3. Push the Docker image to the registry"
+#    # - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG
+#    # - docker push my-registry/my-app:latest
+#    - echo "4. Configure kubectl (if not already configured on the runner)"
+#    # - Configure KUBECONFIG variable or use GitLab's K8s integration
+#    - echo "5. Apply Kubernetes manifests or use Helm to deploy/update the application"
+#    # - kubectl apply -f k8s/deployment.yaml
+#    # - helm upgrade --install my-release ./helm-chart -f values.yaml --set image.tag=$CI_COMMIT_TAG
+#    - echo "6. Deploy Keycloak (if needed) and configure application connection details (secrets/configmaps)"
+#    - echo "Deployment Complete (Placeholder)"
+#  when: manual # Trigger this job manually from the GitLab UI
+#  environment:
+#    name: staging
+#    # url: Link to the deployed environment
