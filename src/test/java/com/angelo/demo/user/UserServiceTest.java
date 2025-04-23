@@ -1,6 +1,5 @@
 package com.angelo.demo.user;
 
-import com.angelo.demo.config.RestTemplateClient;
 import com.angelo.demo.common.dto.UserAndPostsDto;
 import com.angelo.demo.post.entity.Post;
 import com.angelo.demo.user.entity.User;
@@ -8,14 +7,15 @@ import com.angelo.demo.exception.UserInvalidException;
 import com.angelo.demo.exception.UserNotFoundException;
 import com.angelo.demo.mapper.Mapper;
 import com.angelo.demo.post.PostRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -25,8 +25,12 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
+class UserServiceTest {
 
-class UserServiceImplTest {
+    private static final String POSTS_PATH = "/posts";
+    private static final String USERS_PATH = "/users";
+
     @Mock
     UserRepository userRepository;
 
@@ -40,22 +44,16 @@ class UserServiceImplTest {
     WebClient webClient;
 
     @Mock
-    WebClient.RequestHeadersUriSpec requestHeadersUriSpec;
+    WebClient.RequestHeadersUriSpec requestHeadersUriSpecMock;
 
     @Mock
-    WebClient.RequestHeadersSpec requestHeadersSpec;
+    WebClient.RequestHeadersSpec requestHeadersSpecMock;
 
     @Mock
-    WebClient.ResponseSpec responseSpec;
+    WebClient.ResponseSpec responseSpecMock;
 
     @InjectMocks
     UserService userService;
-
-    @BeforeEach
-    public void setUp() {
-        MockitoAnnotations.initMocks(this);
-    }
-
 
     @Test
     public void testGetAllUsers_Success() throws Exception {
@@ -203,10 +201,11 @@ class UserServiceImplTest {
         dto.setUserName("testUser");
         dto.setEmail("test@example.com");
 
-        when(userRepository.existsByUsername(dto.getUserName())).thenReturn(true);
+        lenient().when(userRepository.existsByUsername(dto.getUserName())).thenReturn(true);
 
         // Act and Assert
-        assertThrows(UserInvalidException.class, () -> userService.addUser(dto));
+        UserInvalidException exception = assertThrows(UserInvalidException.class, () -> userService.addUser(dto));
+        assertEquals("Full name required", exception.getMessage());
     }
 
     @Test
@@ -251,11 +250,15 @@ class UserServiceImplTest {
         // Arrange
         UserAndPostsDto dto = new UserAndPostsDto();
         dto.setId(1L);
+        dto.setFullName("Test Name");
+        dto.setUserName("testUser");
+        dto.setEmail("test@example.com");
 
         when(userRepository.existsById(dto.getId())).thenReturn(false);
 
         // Act and Assert
-        assertThrows(UserInvalidException.class, () -> userService.changeUser(dto));
+        UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> userService.changeUser(dto));
+        assertEquals("User to update not found", exception.getMessage());
     }
 
     @Test
@@ -299,9 +302,21 @@ class UserServiceImplTest {
         List<User> users = Arrays.asList(user);
 
         ResponseEntity<List<User>> userResponse = new ResponseEntity<>(users, HttpStatus.OK);
-        ResponseEntity<List<Post>> postResponse = new ResponseEntity<>(posts, HttpStatus.OK);
+        Mono<ResponseEntity<List<User>>> userMono = Mono.just(userResponse);
 
-        when(webClient.get().uri("/users").retrieve().toEntityList(User.class).block()).thenReturn(userResponse);
+        ResponseEntity<List<Post>> postResponse = new ResponseEntity<>(posts, HttpStatus.OK);
+        Mono<ResponseEntity<List<Post>>> postMono = Mono.just(postResponse);
+
+        when(webClient.get()).thenReturn(requestHeadersUriSpecMock);
+        when(requestHeadersSpecMock.retrieve()).thenReturn(responseSpecMock);
+
+        // Mocking for the /posts call
+        when(requestHeadersUriSpecMock.uri(POSTS_PATH)).thenReturn(requestHeadersSpecMock);
+        when(responseSpecMock.toEntityList(Post.class)).thenReturn(postMono);
+
+        // Mocking for the /users call
+        when(requestHeadersUriSpecMock.uri(USERS_PATH)).thenReturn(requestHeadersSpecMock);
+        when(responseSpecMock.toEntityList(User.class)).thenReturn(userMono);
 
         // Act
         userService.fetchAllUsersFromApi();

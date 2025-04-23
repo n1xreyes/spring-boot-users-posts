@@ -15,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.util.*;
 
@@ -23,6 +24,9 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class PostServiceTest {
+
+    private static final String POSTS_PATH = "/posts";
+
     @Mock
     PostRepository postRepository;
 
@@ -36,23 +40,16 @@ class PostServiceTest {
     WebClient webClient;
 
     @Mock
-    WebClient.RequestHeadersUriSpec requestHeadersUriSpec;
+    WebClient.RequestHeadersUriSpec requestHeadersUriSpecMock;
 
     @Mock
-    WebClient.RequestHeadersSpec requestHeadersSpec;
+    WebClient.RequestHeadersSpec requestHeadersSpecMock;
 
     @Mock
-    WebClient.ResponseSpec responseSpec;
+    WebClient.ResponseSpec responseSpecMock;
 
     @InjectMocks
     PostService postService;
-
-    @BeforeEach
-    void setUp() {
-//        when(webClient.get()).thenReturn(requestHeadersUriSpec);
-//        when(requestHeadersUriSpec.uri(anyString())).thenReturn(requestHeadersSpec);
-//        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
-    }
 
     @Test
     public void testFindAll() {
@@ -278,21 +275,31 @@ class PostServiceTest {
     @Test
     public void testFetchAndSavePosts() throws Exception {
         // Arrange
-        when(webClient.get()).thenReturn(requestHeadersUriSpec);
-        when(requestHeadersUriSpec.uri(anyString())).thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
+        // --- Post Data ---
         Post post = new Post();
         post.setId(1L);
+        post.setTitle("API Post Title");
+        post.setBody("API Post Body");
+        post.setUserId(10L);
         List<Post> posts = Arrays.asList(post);
-
         ResponseEntity<List<Post>> response = new ResponseEntity<>(posts, HttpStatus.OK);
+        Mono<ResponseEntity<List<Post>>> postMono = Mono.just(response);
 
-        when(webClient.get().uri("/posts").retrieve().toEntityList(Post.class).block()).thenReturn(response);
+        when(webClient.get()).thenReturn(requestHeadersUriSpecMock);
+        when(requestHeadersUriSpecMock.uri(POSTS_PATH)).thenReturn(requestHeadersSpecMock);
+        when(requestHeadersSpecMock.retrieve()).thenReturn(responseSpecMock);
+        when(responseSpecMock.toEntityList(Post.class)).thenReturn(postMono);
 
         // Act
         postService.fetchAndSavePosts();
 
         // Assert
+        // Verify the chain was called
+        verify(webClient).get();
+        verify(requestHeadersUriSpecMock).uri(POSTS_PATH);
+        verify(requestHeadersSpecMock).retrieve();
+        verify(responseSpecMock).toEntityList(Post.class);
+        // Verify the repository interaction
         verify(postRepository, times(1)).saveAll(posts);
     }
 
