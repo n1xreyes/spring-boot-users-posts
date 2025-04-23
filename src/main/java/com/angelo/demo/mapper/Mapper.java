@@ -1,9 +1,9 @@
 package com.angelo.demo.mapper;
 
-import com.angelo.demo.dto.PostDto;
-import com.angelo.demo.dto.UserAndPostsDto;
-import com.angelo.demo.entity.Post;
-import com.angelo.demo.entity.User;
+import com.angelo.demo.post.dto.PostDto;
+import com.angelo.demo.common.dto.UserAndPostsDto;
+import com.angelo.demo.post.entity.Post;
+import com.angelo.demo.user.entity.User;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 

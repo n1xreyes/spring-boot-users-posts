@@ -1,4 +1,4 @@
-package com.angelo.demo.entity;
+package com.angelo.demo.post.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;

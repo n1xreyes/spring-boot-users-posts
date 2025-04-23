@@ -1,6 +1,6 @@
 package com.angelo.demo.util;
 
-import com.angelo.demo.dto.UserAndPostsDto;
+import com.angelo.demo.common.dto.UserAndPostsDto;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 

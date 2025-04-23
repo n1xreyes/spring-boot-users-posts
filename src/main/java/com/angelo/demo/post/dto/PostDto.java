@@ -1,4 +1,4 @@
-package com.angelo.demo.dto;
+package com.angelo.demo.post.dto;
 
 import lombok.Data;
 

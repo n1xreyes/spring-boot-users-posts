@@ -1,26 +1,21 @@
-package com.angelo.demo.impl;
+package com.angelo.demo.post;
 
 import com.angelo.demo.config.RestTemplateClient;
-import com.angelo.demo.dto.PostDto;
-import com.angelo.demo.entity.Post;
+import com.angelo.demo.post.dto.PostDto;
+import com.angelo.demo.post.entity.Post;
 import com.angelo.demo.exception.PostInvalidException;
 import com.angelo.demo.exception.PostNotFoundException;
 import com.angelo.demo.mapper.Mapper;
-import com.angelo.demo.repository.PostRepository;
-import com.angelo.demo.repository.UserRepository;
-import com.angelo.demo.service.PostService;
+import com.angelo.demo.user.UserRepository;
 import com.flextrade.jfixture.JFixture;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.Arrays;
@@ -32,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class PostServiceImplTest {
+class PostServiceTest {
     @Mock
     PostRepository postRepository;
 

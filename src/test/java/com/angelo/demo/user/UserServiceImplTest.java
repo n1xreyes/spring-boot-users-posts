@@ -1,14 +1,13 @@
-package com.angelo.demo.impl;
+package com.angelo.demo.user;
 
 import com.angelo.demo.config.RestTemplateClient;
-import com.angelo.demo.dto.UserAndPostsDto;
-import com.angelo.demo.entity.Post;
-import com.angelo.demo.entity.User;
+import com.angelo.demo.common.dto.UserAndPostsDto;
+import com.angelo.demo.post.entity.Post;
+import com.angelo.demo.user.entity.User;
 import com.angelo.demo.exception.UserInvalidException;
 import com.angelo.demo.exception.UserNotFoundException;
 import com.angelo.demo.mapper.Mapper;
-import com.angelo.demo.repository.PostRepository;
-import com.angelo.demo.repository.UserRepository;
+import com.angelo.demo.post.PostRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -41,7 +40,7 @@ class UserServiceImplTest {
     RestTemplateClient restTemplate;
 
     @InjectMocks
-    UserServiceImpl userService;
+    UserService userService;
 
     @BeforeEach
     public void setUp() {

@@ -1,6 +1,6 @@
-package com.angelo.demo.repository;
+package com.angelo.demo.post;
 
-import com.angelo.demo.entity.Post;
+import com.angelo.demo.post.entity.Post;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;

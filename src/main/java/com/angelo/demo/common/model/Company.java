@@ -1,4 +1,4 @@
-package com.angelo.demo.model;
+package com.angelo.demo.common.model;
 
 import jakarta.persistence.*;
 import lombok.Data;

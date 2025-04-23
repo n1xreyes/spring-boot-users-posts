@@ -1,7 +1,7 @@
-package com.angelo.demo.entity;
+package com.angelo.demo.user.entity;
 
-import com.angelo.demo.model.Address;
-import com.angelo.demo.model.Company;
+import com.angelo.demo.common.model.Address;
+import com.angelo.demo.common.model.Company;
 import jakarta.persistence.*;
 import lombok.Data;
 

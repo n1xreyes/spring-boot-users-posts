@@ -1,9 +1,8 @@
-package com.angelo.demo.controller;
+package com.angelo.demo.post;
 
-import com.angelo.demo.dto.PostDto;
+import com.angelo.demo.post.dto.PostDto;
 import com.angelo.demo.exception.PostInvalidException;
 import com.angelo.demo.exception.PostNotFoundException;
-import com.angelo.demo.service.PostService;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

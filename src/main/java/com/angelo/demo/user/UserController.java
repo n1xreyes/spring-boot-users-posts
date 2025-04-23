@@ -1,10 +1,9 @@
-package com.angelo.demo.controller;
+package com.angelo.demo.user;
 
-import com.angelo.demo.dto.UserAndPostsDto;
+import com.angelo.demo.common.dto.UserAndPostsDto;
 import com.angelo.demo.exception.UserAlreadyExistsException;
 import com.angelo.demo.exception.UserInvalidException;
 import com.angelo.demo.exception.UserNotFoundException;
-import com.angelo.demo.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;

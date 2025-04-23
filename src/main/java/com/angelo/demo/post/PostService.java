@@ -1,13 +1,12 @@
-package com.angelo.demo.service;
+package com.angelo.demo.post;
 
 import com.angelo.demo.config.RestTemplateClient;
-import com.angelo.demo.dto.PostDto;
-import com.angelo.demo.entity.Post;
+import com.angelo.demo.post.dto.PostDto;
+import com.angelo.demo.post.entity.Post;
 import com.angelo.demo.exception.PostInvalidException;
 import com.angelo.demo.exception.PostNotFoundException;
 import com.angelo.demo.mapper.Mapper;
-import com.angelo.demo.repository.PostRepository;
-import com.angelo.demo.repository.UserRepository;
+import com.angelo.demo.user.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -186,7 +185,6 @@ public class PostService {
     @Transactional
     public void fetchAndSavePosts() throws Exception {
         ResponseEntity<List<Post>> posts = webClient.get()
-                .uri("/posts")
                 .retrieve()
                 .toEntityList(Post.class)
                 .block();

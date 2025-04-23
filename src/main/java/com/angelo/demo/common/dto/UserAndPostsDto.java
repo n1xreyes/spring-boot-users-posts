@@ -1,8 +1,8 @@
-package com.angelo.demo.dto;
+package com.angelo.demo.common.dto;
 
-import com.angelo.demo.entity.Post;
-import com.angelo.demo.model.Address;
-import com.angelo.demo.model.Company;
+import com.angelo.demo.post.entity.Post;
+import com.angelo.demo.common.model.Address;
+import com.angelo.demo.common.model.Company;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
