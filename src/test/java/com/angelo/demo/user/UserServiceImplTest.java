@@ -15,7 +15,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -37,7 +37,16 @@ class UserServiceImplTest {
     Mapper mapper;
 
     @Mock
-    RestTemplateClient restTemplate;
+    WebClient webClient;
+
+    @Mock
+    WebClient.RequestHeadersUriSpec requestHeadersUriSpec;
+
+    @Mock
+    WebClient.RequestHeadersSpec requestHeadersSpec;
+
+    @Mock
+    WebClient.ResponseSpec responseSpec;
 
     @InjectMocks
     UserService userService;
@@ -287,23 +296,18 @@ class UserServiceImplTest {
         post.setUserId(user.getId());
 
         List<Post> posts = Arrays.asList(post);
-        User[] users = new User[]{user};
-        Post[] postsArray = posts.toArray(new Post[0]);
+        List<User> users = Arrays.asList(user);
 
-        ResponseEntity<User[]> userResponse = new ResponseEntity<>(users, HttpStatus.OK);
-        ResponseEntity<Post[]> postResponse = new ResponseEntity<>(postsArray, HttpStatus.OK);
+        ResponseEntity<List<User>> userResponse = new ResponseEntity<>(users, HttpStatus.OK);
+        ResponseEntity<List<Post>> postResponse = new ResponseEntity<>(posts, HttpStatus.OK);
 
-        when(restTemplate.getForEntity(anyString(), eq(User[].class))).thenReturn(userResponse);
-        when(restTemplate.getForEntity(anyString(), eq(Post[].class))).thenReturn(postResponse);
-
-        ReflectionTestUtils.setField(userService, "postsApi", "mockPostsApi");
-        ReflectionTestUtils.setField(userService, "usersApi", "mockUsersApi");
+        when(webClient.get().uri("/users").retrieve().toEntityList(User.class).block()).thenReturn(userResponse);
 
         // Act
         userService.fetchAllUsersFromApi();
 
         // Assert
-        verify(userRepository, times(1)).saveAll(Arrays.asList(users));
+        verify(userRepository, times(1)).saveAll(users);
         verify(postRepository, times(1)).saveAll(posts);
     }
 }

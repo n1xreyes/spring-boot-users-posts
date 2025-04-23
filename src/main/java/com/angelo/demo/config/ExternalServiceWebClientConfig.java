@@ -19,7 +19,7 @@ import reactor.netty.http.client.HttpClient;
 @Configuration
 public class ExternalServiceWebClientConfig {
 
-    @Value("${jsonplaceholder.url}")
+    @Value("${jsonplaceholder.api.url}")
     private String baseUrl;
 
     @Bean

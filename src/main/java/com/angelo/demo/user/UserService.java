@@ -1,6 +1,5 @@
 package com.angelo.demo.user;
 
-import com.angelo.demo.config.RestTemplateClient;
 import com.angelo.demo.common.dto.UserAndPostsDto;
 import com.angelo.demo.user.entity.User;
 import com.angelo.demo.exception.UserAlreadyExistsException;
@@ -12,11 +11,11 @@ import com.angelo.demo.post.entity.Post;
 import com.angelo.demo.util.EmailValidator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.text.MessageFormat;
 import java.util.*;
@@ -25,6 +24,10 @@ import java.util.stream.StreamSupport;
 @Slf4j
 @Service
 public class UserService {
+
+    private static final String POSTS_PATH = "/posts";
+    private static final String USERS_PATH = "/users";
+
     @Autowired
     private UserRepository userRepository;
 
@@ -32,16 +35,10 @@ public class UserService {
     private PostRepository postRepository;
 
     @Autowired
-    private RestTemplateClient restTemplate;
+    private WebClient webClient;
 
     @Autowired
     private Mapper mapper;
-
-    @Value("${posts.api.url}")
-    private String postsApi;
-
-    @Value("${users.api.url}")
-    private String usersApi;
 
     /**
      * Gets all users from the database. This makes a database call to userRepository to build a list of users
@@ -178,21 +175,47 @@ public class UserService {
      */
     @Transactional
     public void fetchAllUsersFromApi() throws Exception {
-        log.info("fetch all posts from API");
-        ResponseEntity<Post[]> postResponse = restTemplate.getForEntity(postsApi, Post[].class);
-        List<Post> posts = postResponse.hasBody() ? Arrays.asList(Objects.requireNonNull(postResponse.getBody(), "")) : Collections.emptyList();
-        if (!posts.isEmpty()) {
-            postRepository.saveAll(Objects.requireNonNull(posts));
+        log.info("Fetch all posts from API using WebClient and path: {}", POSTS_PATH);
+
+        ResponseEntity<List<Post>> postResponseEntity = webClient.get()
+                // *** Use relative path constant ***
+                .uri(POSTS_PATH)
+                .retrieve()
+                .toEntityList(Post.class)
+                .block();
+
+        List<Post> posts = Collections.emptyList();
+        if (postResponseEntity != null && postResponseEntity.hasBody()) {
+            posts = postResponseEntity.getBody();
+            if (posts != null && !posts.isEmpty()) {
+                log.info("Fetched {} posts from API. Saving...", posts.size());
+                postRepository.saveAll(posts);
+            } else {
+                log.info("Fetched posts from API, but the list was null or empty.");
+            }
+        } else {
+            log.warn("Failed to fetch posts or response was empty.");
         }
 
-        log.info("get all users from API");
-        ResponseEntity<User[]> userResponse = restTemplate.getForEntity(usersApi, User[].class);
-        if (userResponse.hasBody() && Objects.requireNonNull(userResponse.getBody()).length > 0) {
-            User[] users = userResponse.getBody();
 
-            log.debug("users and posts: {}", (Object) users);
+        log.info("Get all users from API using WebClient and path: {}", USERS_PATH);
+        ResponseEntity<List<User>> userResponseEntity = webClient.get()
+                .uri(USERS_PATH)
+                .retrieve()
+                .toEntityList(User.class)
+                .block();
 
-            userRepository.saveAll(Arrays.asList(users));
+        if (userResponseEntity != null && userResponseEntity.hasBody()) {
+            List<User> users = userResponseEntity.getBody();
+            if (users != null && !users.isEmpty()) {
+                log.info("Fetched {} users from API. Saving...", users.size());
+                log.debug("Users fetched: {}", users);
+                userRepository.saveAll(users);
+            } else {
+                log.info("Fetched users from API, but the list was null or empty.");
+            }
+        } else {
+            log.warn("Failed to fetch users or response was empty.");
         }
     }
 

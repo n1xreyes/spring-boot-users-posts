@@ -1,29 +1,29 @@
 package com.angelo.demo.post;
 
-import com.angelo.demo.config.RestTemplateClient;
 import com.angelo.demo.post.dto.PostDto;
 import com.angelo.demo.post.entity.Post;
 import com.angelo.demo.exception.PostInvalidException;
 import com.angelo.demo.exception.PostNotFoundException;
 import com.angelo.demo.mapper.Mapper;
 import com.angelo.demo.user.UserRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.stream.StreamSupport;
 
 @Service
+@Slf4j
 public class PostService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PostService.class);
+    private static final String POSTS_PATH = "/posts";
+    
     @Autowired
     private PostRepository postRepository;
 
@@ -31,17 +31,10 @@ public class PostService {
     private UserRepository userRepository;
 
     @Autowired
-    private RestTemplateClient restTemplate;
-
-    @Autowired
     private WebClient webClient;
 
     @Autowired
     private Mapper mapper;
-
-    @Value("${posts.api.url}")
-    private String postsEndpoint;
-
 
     /**
      * Finds all posts from the database
@@ -49,7 +42,7 @@ public class PostService {
      */
     @Transactional
     public List<PostDto> findAll() {
-        LOGGER.info("fetch all posts from database");
+        log.info("fetch all posts from database");
 
         List<Post> postList = StreamSupport.stream(postRepository.findAll().spliterator(), false)
                 .toList();
@@ -66,7 +59,7 @@ public class PostService {
      */
     @Transactional
     public PostDto findById(Long id) {
-        LOGGER.info("fetching individual post by ID");
+        log.info("fetching individual post by ID");
 
         Optional<Post> post = postRepository.findById(id);
 
@@ -80,7 +73,7 @@ public class PostService {
      */
     @Transactional
     public List<PostDto> findAllPostsByUserId(Long userId) {
-        LOGGER.info("retrieving all posts by User ID {}", userId);
+        log.info("retrieving all posts by User ID {}", userId);
         List<Post> postList = postRepository.findByUserId(userId);
 
         List<PostDto> postDtos = postList.stream().map(post -> mapper.postToDto(post)).toList();
@@ -96,9 +89,9 @@ public class PostService {
      */
     @Transactional
     public PostDto savePost(Long userId, PostDto dto) {
-        LOGGER.info("adding post --- checking if user exists");
+        log.info("adding post --- checking if user exists");
         if (!userRepository.existsById(userId)) {
-            LOGGER.error("User does not exist");
+            log.error("User does not exist");
             String message = MessageFormat.format("User with id {0} does not exist", userId);
             throw new PostInvalidException(message);
         }
@@ -108,7 +101,7 @@ public class PostService {
         try {
             return mapper.postToDto(postRepository.save(post));
         } catch (Exception e) {
-            LOGGER.error("An exception occurred when attempting to save post");
+            log.error("An exception occurred when attempting to save post");
             String message = MessageFormat.format("An exception occurred: {0} - cause {1}", e.getMessage(), e.getCause());
             throw new PostInvalidException(message);
         }
@@ -124,21 +117,21 @@ public class PostService {
      */
     @Transactional
     public PostDto updatePost(Long id, Long userId, PostDto dto) {
-        LOGGER.info("updating post --- checking if user exists");
+        log.info("updating post --- checking if user exists");
         if (!userRepository.existsById(userId)) {
-            LOGGER.error("User does not exist");
+            log.error("User does not exist");
             String message = MessageFormat.format("User with id {0} does not exist", userId);
             throw new PostInvalidException(message);
         }
 
         if(!postRepository.existsById(id)) {
-            LOGGER.error("Post ID does not exist");
+            log.error("Post ID does not exist");
             String message = MessageFormat.format("Post with id {0} does not exist", id);
             throw new PostNotFoundException(message);
         }
 
         if (null == postRepository.findByIdAndUserId(id, userId)) {
-            LOGGER.error("This post does not belong to the provide userID");
+            log.error("This post does not belong to the provide userID");
             String message = MessageFormat.format("Post with id {0} does not belong to userID {1}", id, userId);
             throw new PostInvalidException(message);
         }
@@ -151,13 +144,13 @@ public class PostService {
                 postToUpdate.setBody(dto.getBody());
 
                 Post savedPost = postRepository.save(postToUpdate);
-                LOGGER.info("post updated for post id {} and userID {}", id, userId);
+                log.info("post updated for post id {} and userID {}", id, userId);
                 return mapper.postToDto(savedPost);
             } else {
                 throw new PostNotFoundException("Post to update not found");
             }
         } catch (Exception e) {
-            LOGGER.error("An exception occurred when attempting to save post");
+            log.error("An exception occurred when attempting to save post");
             String message = MessageFormat.format("An exception occurred: {0} - cause {1}", e.getMessage(), e.getCause());
             throw new PostInvalidException(message);
         }
@@ -170,7 +163,7 @@ public class PostService {
      */
     @Transactional
     public void deleteById(Long id) throws Exception {
-        LOGGER.info("Deleting post with ID {}", id);
+        log.info("Deleting post with ID {}", id);
         if (postRepository.existsById(id)) {
             postRepository.deleteById(id);
         } else {
@@ -184,20 +177,32 @@ public class PostService {
      */
     @Transactional
     public void fetchAndSavePosts() throws Exception {
-        ResponseEntity<List<Post>> posts = webClient.get()
-                .retrieve()
-                .toEntityList(Post.class)
-                .block();
+        log.info("fetching users and posts from path: {}", POSTS_PATH);
+        try {
+            ResponseEntity<List<Post>> postsResponseEntity = webClient.get()
+                    .uri(POSTS_PATH)
+                    .retrieve()
+                    .toEntityList(Post.class)
+                    .block(); // Block for synchronous execution
 
-        postRepository.saveAll(Objects.requireNonNull(Objects.requireNonNull(posts).getBody()));
-//        try {
-//            ResponseEntity<Post[]> response = restTemplate.getForEntity(postsEndpoint, Post[].class);
-//            postRepository.saveAll(Arrays.asList(Objects.requireNonNull(response.getBody())));
-//        } catch (NullPointerException e) {
-//            throw new Exception(e.getMessage());
-//        } catch (Exception e) {
-//            throw new Exception(e.getMessage());
-//        }
-
+            if (postsResponseEntity != null && postsResponseEntity.hasBody()) {
+                List<Post> posts = postsResponseEntity.getBody();
+                if (posts != null && !posts.isEmpty()) {
+                    log.info("Successfully fetched {} posts from API. Saving to database...", posts.size());
+                    postRepository.saveAll(posts);
+                    log.info("Posts saved successfully.");
+                } else {
+                    log.info("Fetched posts from API, but the list was null or empty. No posts saved.");
+                }
+            } else {
+                log.warn("Received null or empty response entity when fetching posts.");
+            }
+        } catch (WebClientResponseException e) {
+            log.error("Error fetching posts from API: Status code {}, Body: {}", e.getStatusCode(), e.getResponseBodyAsString(), e);
+            throw new Exception(MessageFormat.format("Error fetching posts from API: {0}", e.getMessage()), e);
+        } catch (Exception e) {
+            log.error("An unexpected error occurred during fetch or save of posts: {}", e.getMessage(), e);
+            throw new Exception("An unexpected error occurred while fetching and saving posts.", e);
+        }
     }
 }

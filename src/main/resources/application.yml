@@ -1,0 +1,43 @@
+server:
+  port: 8081
+
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: password
+    # database-platform: org.hibernate.dialect.H2Dialect
+
+  h2:
+    console:
+      enabled: true
+
+  security:
+    oauth2:
+      client:
+        registration:
+          keycloak:
+            client-id: myclient
+            authorization-grant-type: authorization_code
+            scope: openid
+        provider:
+          keycloak:
+            issuer-uri: http://auth-server:8080/realms/myrealm
+            user-name-attribute: preferred_username
+
+      resourceserver:
+        jwt:
+          expected-issuer: http://localhost:8080/realms/myrealm
+          issuer-uri: http://auth-server:8080/realms/myrealm
+
+keycloak:
+  expected-issuer-uri: http://localhost:8080/realms/myrealm
+
+springdoc:
+  api-docs:
+    path: /api-docs
+
+jsonplaceholder:
+  api:
+    url: https://jsonplaceholder.typicode.com

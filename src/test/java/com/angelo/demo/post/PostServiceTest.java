@@ -1,27 +1,22 @@
 package com.angelo.demo.post;
 
-import com.angelo.demo.config.RestTemplateClient;
 import com.angelo.demo.post.dto.PostDto;
 import com.angelo.demo.post.entity.Post;
 import com.angelo.demo.exception.PostInvalidException;
 import com.angelo.demo.exception.PostNotFoundException;
 import com.angelo.demo.mapper.Mapper;
 import com.angelo.demo.user.UserRepository;
-import com.flextrade.jfixture.JFixture;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -35,18 +30,29 @@ class PostServiceTest {
     UserRepository userRepository;
 
     @Mock
-    RestTemplateClient restTemplate;
+    Mapper mapper;
 
-    @MockBean
+    @Mock
     WebClient webClient;
 
     @Mock
-    Mapper mapper;
+    WebClient.RequestHeadersUriSpec requestHeadersUriSpec;
+
+    @Mock
+    WebClient.RequestHeadersSpec requestHeadersSpec;
+
+    @Mock
+    WebClient.ResponseSpec responseSpec;
 
     @InjectMocks
     PostService postService;
 
-    JFixture fixture = new JFixture();
+    @BeforeEach
+    void setUp() {
+//        when(webClient.get()).thenReturn(requestHeadersUriSpec);
+//        when(requestHeadersUriSpec.uri(anyString())).thenReturn(requestHeadersSpec);
+//        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
+    }
 
     @Test
     public void testFindAll() {
@@ -272,7 +278,11 @@ class PostServiceTest {
     @Test
     public void testFetchAndSavePosts() throws Exception {
         // Arrange
-        Post post = fixture.create(Post.class);
+        when(webClient.get()).thenReturn(requestHeadersUriSpec);
+        when(requestHeadersUriSpec.uri(anyString())).thenReturn(requestHeadersSpec);
+        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
+        Post post = new Post();
+        post.setId(1L);
         List<Post> posts = Arrays.asList(post);
 
         ResponseEntity<List<Post>> response = new ResponseEntity<>(posts, HttpStatus.OK);
