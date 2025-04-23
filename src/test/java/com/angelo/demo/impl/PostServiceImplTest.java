@@ -8,14 +8,20 @@ import com.angelo.demo.exception.PostNotFoundException;
 import com.angelo.demo.mapper.Mapper;
 import com.angelo.demo.repository.PostRepository;
 import com.angelo.demo.repository.UserRepository;
+import com.angelo.demo.service.PostService;
+import com.flextrade.jfixture.JFixture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -25,6 +31,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class PostServiceImplTest {
     @Mock
     PostRepository postRepository;
@@ -35,16 +42,16 @@ class PostServiceImplTest {
     @Mock
     RestTemplateClient restTemplate;
 
+    @MockBean
+    WebClient webClient;
+
     @Mock
     Mapper mapper;
 
     @InjectMocks
-    PostServiceImpl postService;
+    PostService postService;
 
-    @BeforeEach
-    public void setUp() {
-        MockitoAnnotations.initMocks(this);
-    }
+    JFixture fixture = new JFixture();
 
     @Test
     public void testFindAll() {
@@ -268,23 +275,20 @@ class PostServiceImplTest {
 
 
     @Test
-    public void testFetchPosts() throws Exception {
+    public void testFetchAndSavePosts() throws Exception {
         // Arrange
-        Post post = new Post();
-        post.setId(1L);
-        Post[] posts = new Post[]{post};
+        Post post = fixture.create(Post.class);
+        List<Post> posts = Arrays.asList(post);
 
-        ResponseEntity<Post[]> response = new ResponseEntity<>(posts, HttpStatus.OK);
+        ResponseEntity<List<Post>> response = new ResponseEntity<>(posts, HttpStatus.OK);
 
-        when(restTemplate.getForEntity(anyString(), eq(Post[].class))).thenReturn(response);
-
-        ReflectionTestUtils.setField(postService, "api", "mockApi");
+        when(webClient.get().uri("/posts").retrieve().toEntityList(Post.class).block()).thenReturn(response);
 
         // Act
-        postService.fetchPosts();
+        postService.fetchAndSavePosts();
 
         // Assert
-        verify(postRepository, times(1)).saveAll(Arrays.asList(posts));
+        verify(postRepository, times(1)).saveAll(posts);
     }
 
 }

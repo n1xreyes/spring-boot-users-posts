@@ -1,7 +1,6 @@
 package com.angelo.demo.controller;
 
 import com.angelo.demo.dto.PostDto;
-import com.angelo.demo.entity.Post;
 import com.angelo.demo.exception.PostInvalidException;
 import com.angelo.demo.exception.PostNotFoundException;
 import com.angelo.demo.service.PostService;
@@ -14,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/posts")
@@ -86,7 +84,7 @@ public class PostController {
 
     @PostMapping("/fetch")
     public ResponseEntity<String> fetchPosts() throws Exception {
-        postService.fetchPosts();
+        postService.fetchAndSavePosts();
         return new ResponseEntity<>("Posts retrieved from JSONPlaceholder API", HttpStatus.OK);
     }
 }
