@@ -184,7 +184,7 @@ public class UserService {
                 .toEntityList(Post.class)
                 .block();
 
-        List<Post> posts = Collections.emptyList();
+        List<Post> posts;
         if (postResponseEntity != null && postResponseEntity.hasBody()) {
             posts = postResponseEntity.getBody();
             if (posts != null && !posts.isEmpty()) {
