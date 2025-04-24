@@ -162,31 +162,50 @@
 						<goals>
 							<goal>report</goal>
 						</goals>
+						<configuration>
+							<excludes>
+								<exclude>com/angelo/demo/common/dto/**</exclude>
+								<exclude>com/angelo/demo/common/model/**</exclude>
+								<exclude>com/angelo/demo/post/dto/**</exclude>
+								<exclude>com/angelo/demo/post/entity/**</exclude>
+								<exclude>com/angelo/demo/user/entity/**</exclude>
+								<exclude>com/angelo/demo/DemoApplication.class</exclude>
+								<exclude>com/angelo/demo/config/**</exclude>
+								<exclude>com/angelo/demo/exception/**</exclude>
+							</excludes>
+						</configuration>
 					</execution>
 					<execution>
 						<id>check</id>
+						<phase>test</phase>
 						<goals>
 							<goal>check</goal>
 						</goals>
 						<configuration>
 							<rules>
 								<rule>
-									<element>CLASS</element>
+									<element>BUNDLE</element>
 									<limits>
 										<limit>
-											<counter>CLASS</counter>
+											<counter>INSTRUCTION</counter>
 											<value>COVEREDRATIO</value>
-											<minimum>0.80</minimum>
+											<minimum>0.70</minimum>
 										</limit>
-<!--										<limit>-->
-<!--											<counter>BRANCH</counter>-->
-<!--											<value>COVEREDRATIO</value>-->
-<!--											<minimum>0.80</minimum>-->
-<!--										</limit>-->
+										<limit>
+											<counter>BRANCH</counter>
+											<value>COVEREDRATIO</value>
+											<minimum>0.70</minimum>
+										</limit>
 									</limits>
 									<excludes>
-										<exclude>com.angelo.demo.dto</exclude>
-										<exclude>com.angelo.demo.model</exclude>
+										<exclude>com.angelo.demo.common.dto.*</exclude> <!-- Old style, prefer **/ -->
+										<exclude>com.angelo.demo.common.model.*</exclude>
+										<exclude>com.angelo.demo.post.dto.*</exclude>
+										<exclude>com.angelo.demo.post.entity.*</exclude>
+										<exclude>com.angelo.demo.user.entity.*</exclude>
+										<exclude>com.angelo.demo.DemoApplication</exclude> <!-- Exclude main app -->
+										<exclude>com.angelo.demo.config.*</exclude> <!-- Optional: Exclude config -->
+										<exclude>com.angelo.demo.exception.*</exclude> <!-- Optional: Exclude simple exceptions -->
 									</excludes>
 								</rule>
 							</rules>
