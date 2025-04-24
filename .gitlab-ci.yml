@@ -3,8 +3,7 @@ image: maven:3.9-eclipse-temurin-17
 stages:
   - build_test
   - package
-  - docker_build
-  - docker_push
+  - docker_build_push
 #  - deploy
 
 variables:
@@ -46,7 +45,7 @@ package_app:
     expire_in: 1 week
 
 build_docker:
-  stage: docker_build
+  stage: docker_build_push
   image: docker:latest
   services:
     - docker:dind
@@ -62,21 +61,10 @@ build_docker:
     - echo "  $DOCKER_IMAGE_TAG_SHA"
     - echo "  $DOCKER_IMAGE_TAG_LATEST"
 
-push_docker:
-  stage: docker_push
-  image: docker:latest
-  services:
-    - docker:dind
-  needs: ["build_docker"]
-  before_script:
-    - echo "Logging into GitLab Container Registry..."
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
-  script:
     - echo "--- Pushing Docker Image to Registry ---"
     - docker push "$DOCKER_IMAGE_TAG_SHA"
     - docker push "$DOCKER_IMAGE_TAG_LATEST"
     - echo "Docker images pushed successfully."
-
 
 # Job: Placeholder for Deployment to Kubernetes
 #deploy_to_k8s_placeholder:
