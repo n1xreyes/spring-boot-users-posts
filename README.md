@@ -10,7 +10,7 @@ A simple Spring Boot application that manages users and user posts. It utilizes 
 4. Start playing around with it!
 
 ### Open API Specs
-1. This application uses OpenAPI 3.0 and auto generates the specs. You can view the APIs [here](http://localhost:8081/swagger-ui/index.html)
+1. This application uses OpenAPI 3.0 and auto generates the specs. You can view the APIs [here](http://localhost:8081/swagger-ui/index.html). NOTE: The application must be running locally for you to be able to view this.
 
 ### Authorization
 1. On the Swagger page, note the Authorize button on the right. You will need to generate an auth token to be able to successfully send requests
